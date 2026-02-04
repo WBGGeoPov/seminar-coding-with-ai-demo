@@ -32,6 +32,33 @@ This demonstration follows a complete workflow:
 The complete code is available on GitHub:  
 🔗 https://github.com/wb532966/seminar-coding-with-ai-demo
 
+## Example prompting
+
+### Step 1. Understand the code and be able to run it.
+
+> What is the purpose of this code? Does does it do?
+
+> Can you walk me through the main code files in this project? Explain what they do, how they connect, and which file contains the entry point or main execution logic. What data files are used to run this code and what are produced. 
+
+### Step 2. Restructure it so it is clear and easy to understand
+
+
+> What do you think could be potential improvements to this project structure. My goal is to make it easier to understand to external users. 
+
+> Analyze the quality of code and algorithms. Suggest how the code could be optimized to make the same analysis better structured and more clear. Consider, if needed, changing the structure of the results slightly. 
+
+> What are the data management recommendations in the reproducibility guidelines here: https://worldbank.github.io/wb-reproducible-research-repository/guidance_note_wb.html
+
+> Propose steps for improving this project. Make data clearly structures into Raw, Temp, and Processed. Create a separate output folder for resulting tables and figures. Follow other guidelines form the reproducibility side: https://worldbank.github.io/wb-reproducible-research-repository/guidance_note_wb.html
+
+
+### Step 3. Align it with the reproducibility guidelines and document it
+
+
+### Step 4. Add mapping using R an Agent mode
+
+
+
 ## 📄 License
 
 This project is licensed under the **MIT License** together with the [World Bank IGO Rider](WB-IGO-RIDER.md). The Rider is purely procedural: it reserves all privileges and immunities enjoyed by the World Bank, without adding restrictions to the MIT permissions. Please review both files before using, distributing, or contributing.
