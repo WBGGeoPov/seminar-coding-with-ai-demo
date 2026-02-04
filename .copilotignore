@@ -1,0 +1,41 @@
+# Copilot Ignore File
+# Files and directories that GitHub Copilot should ignore
+
+# Documentation files
+LICENSE.R
+readme.md
+WB-IGO-RIDER.md
+
+# Large data files
+data/survey-2018-2021.dta
+*.dta
+*.csv
+
+# Generated data files
+data/*.dta
+data/*.csv
+data/t*.dta
+data/temp*.dta
+data/output*.csv
+
+# Log files
+*.log
+*.smcl
+
+# Output files
+*.png
+
+# Temporary files
+~$*
+.Rhistory
+.RData
+
+# IDE specific
+.vscode/
+.Rproj.user/
+*.Rproj
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

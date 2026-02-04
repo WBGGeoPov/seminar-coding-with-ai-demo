@@ -1,0 +1,53 @@
+# AI Digest Ignore File
+# Files and directories that AI assistants should ignore when analyzing the project
+
+# Documentation files
+LICENSE.R
+readme.md
+WB-IGO-RIDER.md
+
+# Version Control
+.git/
+.gitignore
+
+# Large survey data file
+data/survey-2018-2021.dta
+
+# Large data files (describe instead of reading)
+*.dta
+*.csv
+*.xlsx
+*.rds
+*.RData
+
+# Binary files
+*.pdf
+*.docx
+*.pptx
+*.zip
+*.tar.gz
+
+# Output files
+*.log
+*.smcl
+
+# Temporary files
+*.tmp
+~$*
+.Rhistory
+.RData
+.Ruserdata
+
+# IDE specific
+.vscode/
+.Rproj.user/
+*.Rproj
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts
+/output/*
+/temp/*
