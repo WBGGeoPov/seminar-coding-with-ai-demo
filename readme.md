@@ -44,7 +44,11 @@ The complete code is available on GitHub:
 
 ### Step 2. Restructure it so it is clear and easy to understand
 
-> How exactly do you think the code should be improved to make this project well-structured, easy to understand, well documented and robust.
+> My purpose is to make this project aligned with the reproducibility requirements from here: https://worldbank.github.io/wb-reproducible-research-repository/guidance_note_wb.html . Check these requirements and summarize what has to be done to align this project?
+
+> Ok procced with Code restructuring and documentation. Notes: (1) Use minimal comments, only essential comments why we do certain things. (2) Do not use any display statements. (3) Do not create functions/programs. Instead of readme.md create readme.txt. (4) make sure that Stata produces result tables that can be imported in other software such as R. 
+
+> (Optional) How exactly do you think the code should be improved to make this project well-structured, easy to understand, well documented and robust.
 
 > (Optional) What recommendations could be adopted from the reproducibility guidelines here: https://worldbank.github.io/wb-reproducible-research-repository/guidance_note_wb.html ?
 
