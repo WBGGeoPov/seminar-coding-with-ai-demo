@@ -1,0 +1,130 @@
+DATA DICTIONARY
+===============
+
+SURVEY DATA VARIABLES
+--------------------
+
+Identifiers:
+- hhid: Household ID (string)
+- year: Survey year (2018, 2019, 2020, 2021)
+- ADM1CD_c: Administrative region code (Level 1)
+
+Demographics:
+- age: Age in years (numeric)
+- adult: Adult indicator (1 = adult, 0 = child)
+- adult_working: Working status (1 = working, 0 = not working)
+- literacy: Literacy status (1 = literate, 0 = illiterate)
+- educat4: Education level (categorical, 4 categories)
+  * 1 = No education
+  * 2 = Primary
+  * 3 = Secondary
+  * 4 = Tertiary
+
+Welfare:
+- welfare: Original welfare measure (local currency)
+- welfare_ppp: PPP-adjusted welfare (constructed variable)
+  * Formula: welfare / cpi2021 / icp2021 * spat_def
+  * Adjusted for inflation, international prices, and spatial cost differences
+- weight_h: Household sampling weight
+
+Geographic:
+- region: Region name (string)
+- sample_group: Sample group identifier
+
+DEFLATOR DATA
+-------------
+
+CPI and PPP (cpi_ppp.csv/dta):
+- year: Year
+- cpi2021: Consumer Price Index (2021 base year)
+- ppp: PPP conversion factor
+
+ICP Spatial Deflators (icp2021.csv/dta):
+- year: Year
+- ADM1CD_c: Region code
+- icp2021: ICP spatial price deflator
+
+Spatial Deflators (spat_def.csv/dta):
+- year: Year
+- ADM1CD_c: Region code
+- spat_def: Spatial cost-of-living deflator
+
+CONSTRUCTED VARIABLES
+---------------------
+
+Descriptive Statistics:
+- age_mean: Mean age by region-year
+- age_sd: Standard deviation of age
+- literacy_mean: Literacy rate (proportion)
+- literacy_sd: Standard deviation of literacy
+- welfare_mean: Mean PPP-adjusted welfare
+- welfare_sd: Standard deviation of welfare
+- n_households: Number of households (unique hhid count)
+- n_obs: Number of individual observations
+
+Poverty Measures:
+- poverty_line: Poverty line (40% of within-year median welfare_ppp)
+- poor: Poverty indicator (1 if welfare_ppp < poverty_line)
+- poverty_rate: Proportion of population below poverty line
+- poverty_gap: Mean poverty gap (depth of poverty)
+  * Formula: mean((poverty_line - welfare_ppp) / poverty_line) for poor only
+
+Inequality Measures:
+- gini_index: Gini coefficient (0-1 scale)
+  * 0 = perfect equality, 1 = perfect inequality
+- theil_index: Theil's T statistic
+  * Measures income inequality, unbounded above
+
+DATA QUALITY NOTES
+------------------
+
+Missing Values:
+- All key variables (welfare, age, ADM1CD_c, year) should have no missing values
+- Validation checks ensure data completeness before analysis
+
+Value Ranges:
+- age: 0-100 years (typical range)
+- welfare_ppp: Positive values only
+- literacy: 0 or 1
+- adult: 0 or 1
+- adult_working: 0 or 1
+
+Weights:
+- All statistics weighted by weight_h (household weight)
+- Poverty and inequality measures use household-level aggregation
+
+DATA TRANSFORMATIONS
+--------------------
+
+Step 1: Import
+- CSV files converted to Stata .dta format
+- Saved to data/processed/
+
+Step 2: Merge
+- Survey data merged with:
+  1. CPI/PPP by year
+  2. ICP deflators by year and region
+  3. Spatial deflators by year and region
+
+Step 3: Welfare Adjustment
+- Create welfare_ppp using all three deflators
+- Validates no missing values in final measure
+
+Step 4: Poverty Line
+- Calculate within each year separately
+- Poverty line = 0.4 × median(welfare_ppp)
+
+OUTPUT VARIABLES
+----------------
+
+Tables:
+All output tables include variables listed above, organized by:
+- descriptives.csv: Region-year level descriptive statistics
+- poverty_inequality.csv: Region-year level poverty and inequality measures
+- national_summary.csv: Country-year level aggregated statistics
+
+Figures:
+All figures are histograms showing distributions of key variables:
+- Individual level: age
+- Household level: household size
+- Welfare level: overall and by year

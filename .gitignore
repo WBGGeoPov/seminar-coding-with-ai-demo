@@ -1,0 +1,18 @@
+# Ignore temp data files
+data/temp/*.dta
+
+# Ignore processed data (can be regenerated)
+data/processed/*.dta
+
+# Ignore output files (can be regenerated)
+output/tables/*.csv
+output/figures/*.png
+output/*.log
+
+# Ignore Stata temporary files
+*.tmp
+*.smcl
+
+# Ignore system files
+.DS_Store
+Thumbs.db

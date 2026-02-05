@@ -1,0 +1,14 @@
+SOFTWARE REQUIREMENTS
+=====================
+
+Stata Version: 16 or higher
+Recommended: Stata 17 or 18
+
+Required Packages: None (uses base Stata only)
+
+Operating System: Windows, macOS, or Linux
+
+Additional Notes:
+- No special Stata packages required
+- All commands use standard Stata functionality
+- Graph export requires PNG capability (standard in all Stata versions)
