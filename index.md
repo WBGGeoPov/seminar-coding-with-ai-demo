@@ -48,6 +48,8 @@ The complete code is available on GitHub:
 
 > Ok procced with Code restructuring and documentation. Notes: (1) Use minimal comments, only essential comments why we do certain things. (2) Do not use any display statements. (3) Do not create functions/programs. Instead of readme.md create readme.txt. (4) make sure that Stata produces result tables that can be imported in other software such as R. 
 
+> Please use existing stata libraries to compute poverty and inequality instead of calculating it yourself. 
+
 > (Optional) How exactly do you think the code should be improved to make this project well-structured, easy to understand, well documented and robust.
 
 > (Optional) What recommendations could be adopted from the reproducibility guidelines here: https://worldbank.github.io/wb-reproducible-research-repository/guidance_note_wb.html ?
@@ -64,9 +66,9 @@ the reproducibility guidelines: https://worldbank.github.io/wb-reproducible-rese
 
 ### Step 4. Add mapping using R in Agent mode
 
-> Change the Stata code so that it produces a clear data set with subnational poverty and inequality estimates by year.
+> Use R to import data on poverty and inequality by regions. Then find the data file with geospatial boundaries and import it too. Figure out how poverty data could be matched with geospatial boundaries and combine them. Then make maps of poverty for different years.
 
-> Use R to import this data. Then find the data file with geospatial boundaries and import it too. Then report how produced poverty estimates could be matched with geospatial boundaries and combine them.
+> (optional) Change the Stata code so that it produces a clear data set with subnational poverty and inequality estimates by year.
 
 > What is the quality of this matching? Are there any regions that did not have corresponding boundaries and vice versa?
 
