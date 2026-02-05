@@ -68,6 +68,8 @@ the reproducibility guidelines: https://worldbank.github.io/wb-reproducible-rese
 
 > Use R to import data on poverty and inequality by regions. Then find the data file with geospatial boundaries and import it too. Figure out how poverty data could be matched with geospatial boundaries and combine them. Then make maps of poverty for different years.
 
+> (optional) Please write all this code into an R scripts, document it and integrate it into the reproducibility workflow.
+
 > (optional) Change the Stata code so that it produces a clear data set with subnational poverty and inequality estimates by year.
 
 > What is the quality of this matching? Are there any regions that did not have corresponding boundaries and vice versa?
