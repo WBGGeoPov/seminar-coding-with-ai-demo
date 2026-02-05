@@ -1,0 +1,75 @@
+================================================================================
+DATA DICTIONARY
+================================================================================
+
+SURVEY DATA: survey-2018-2021.dta
+----------------------------------
+hhid           Household identifier
+year           Survey year (2018, 2019, 2020, 2021)
+region         Geographic region code
+ADM1CD_c       Administrative level 1 code
+age            Age in years
+adult          Binary: 1 if age >= 18
+adult_working  Binary: 1 if working adult
+educat4        Education category (4 levels)
+literacy       Binary: 1 if literate
+welfare        Nominal welfare measure (local currency)
+weight_h       Household sampling weight
+sample_group   Sample stratification group
+
+PRICE DEFLATORS: cpi_ppp.csv
+-----------------------------
+year           Year
+cpi2021        Consumer Price Index (2021 base year)
+ppp            Purchasing Power Parity conversion factor
+
+SPATIAL DEFLATORS: icp2021.csv
+------------------------------
+year           Year
+ADM1CD_c       Administrative level 1 code
+icp_spat_def   ICP spatial price deflator
+
+SPATIAL DEFLATORS: spat_def.csv
+-------------------------------
+year           Year
+ADM1CD_c       Administrative level 1 code
+spat_def       Spatial price deflator (alternative source)
+
+CONSTRUCTED VARIABLES
+---------------------
+welfare_ppp    PPP-adjusted welfare = welfare / cpi2021 / icp2021 * spat_def
+poverty_line   40% of national median welfare (by year)
+poor           Binary: 1 if welfare_ppp < poverty_line
+
+OUTPUT VARIABLES
+----------------
+Table 1 (Descriptive Statistics):
+  n            Number of observations
+  hhsize       Number of households
+  age_mean     Mean age
+  age_sd       Standard deviation of age
+  lit_mean     Mean literacy rate
+  lit_sd       Standard deviation of literacy
+  wel_mean     Mean welfare (PPP-adjusted)
+  wel_sd       Standard deviation of welfare
+
+Table 2 (Poverty and Inequality):
+  pov_rate     Poverty headcount rate
+  pov_gap      Poverty gap (mean normalized distance to poverty line)
+  gini_index   Gini coefficient (0-1, higher = more inequality)
+  theil_index  Theil index (0+, higher = more inequality)
+
+UNITS
+-----
+welfare_ppp    International dollars (PPP-adjusted, 2021 prices)
+age            Years
+literacy       0 = illiterate, 1 = literate
+educat4        1 = no education, 2 = primary, 3 = secondary, 4 = tertiary
+
+NOTES
+-----
+Missing values coded as . (Stata missing)
+Poverty line follows relative poverty standard (40% of median)
+Spatial deflators adjust for cost-of-living differences across regions
+PPP conversion uses 2021 International Comparison Program data
+================================================================================

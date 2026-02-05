@@ -1,0 +1,71 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/T
+> emp/02_clean.log
+  log type:  text
+ opened on:   5 Feb 2026, 09:45:29
+
+. 
+. use "${raw}/survey-2018-2021.dta", clear
+
+. 
+. // Convert year to numeric
+. destring year, replace
+year: all characters numeric; replaced as int
+
+. drop icp2021
+
+. 
+. // Merge CPI and PPP deflators by year
+. merge m:1 year using "${temp}/cpi_ppp.dta", keep(master match) nogenerate
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            49,996  
+    -----------------------------------------
+
+. 
+. // Merge ICP spatial deflators by year and region
+. merge m:1 year ADM1CD_c using "${temp}/icp2021.dta", keep(master match) nogen
+> erate
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            49,996  
+    -----------------------------------------
+
+. 
+. // Merge additional spatial deflators where ICP missing
+. merge m:1 year ADM1CD_c using "${temp}/spat_def.dta", keep(master match) noge
+> nerate
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            49,996  
+    -----------------------------------------
+
+. 
+. // Check for missing deflators
+. misstable summarize cpi2021 icp2021 icp_spat_def spat_def
+(variables nonmissing or string)
+
+. 
+. save "${temp}/survey_merged.dta", replace
+(file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/sur
+    > vey_merged.dta not found)
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/sur
+    > vey_merged.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/T
+> emp/02_clean.log
+  log type:  text
+ closed on:   5 Feb 2026, 09:45:29
+-------------------------------------------------------------------------------

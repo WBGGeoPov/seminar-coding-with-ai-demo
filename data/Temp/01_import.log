@@ -1,0 +1,60 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/T
+> emp/01_import.log
+  log type:  text
+ opened on:   5 Feb 2026, 09:45:29
+
+. 
+. // CPI and PPP conversion factors
+. import delimited "${raw}/cpi_ppp.csv", clear varnames(1)
+(3 vars, 2 obs)
+
+. save "${temp}/cpi_ppp.dta", replace
+(file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/cpi
+    > _ppp.dta not found)
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/cpi
+    > _ppp.dta saved
+
+. 
+. // ICP 2021 spatial deflators
+. import delimited "${raw}/icp2021.csv", clear varnames(1)
+(3 vars, 28 obs)
+
+. rename adm1cd_c ADM1CD_c
+
+. rename spat_def icp_spat_def
+
+. save "${temp}/icp2021.dta", replace
+(file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/icp
+    > 2021.dta not found)
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/icp
+    > 2021.dta saved
+
+. 
+. // Additional spatial deflators
+. import delimited "${raw}/spat_def.csv", clear varnames(1)
+(3 vars, 28 obs)
+
+. rename adm1cd_c ADM1CD_c
+
+. save "${temp}/spat_def.dta", replace
+(file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/spa
+    > t_def.dta not found)
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/spa
+    > t_def.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/T
+> emp/01_import.log
+  log type:  text
+ closed on:   5 Feb 2026, 09:45:29
+-------------------------------------------------------------------------------

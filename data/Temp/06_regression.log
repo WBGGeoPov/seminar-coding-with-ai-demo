@@ -1,0 +1,49 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/T
+> emp/06_regression.log
+  log type:  text
+ opened on:   5 Feb 2026, 09:45:30
+
+. 
+. use "${final}/survey_analysis.dta", clear
+
+. 
+. // Model 1: Pooled regression
+. quietly reg welfare_ppp age adult adult_working i.educat4 i.literacy i.year
+
+. estimates store model1
+
+. 
+. // Model 2: 2018 only
+. quietly reg welfare_ppp age adult adult_working i.educat4 i.literacy if year 
+> == 2018
+
+. estimates store model2
+
+. 
+. // Model 3: 2021 only
+. quietly reg welfare_ppp age adult adult_working i.educat4 i.literacy if year 
+> == 2021
+
+. estimates store model3
+
+. 
+. // Model 4: Pooled with robust standard errors
+. quietly reg welfare_ppp age adult adult_working i.educat4 i.literacy i.year, 
+> robust
+
+. estimates store model4
+
+. 
+. // Export to text file for importing to other software
+. quietly {
+
+. 
+. log close
+      name:  <unnamed>
+       log:  c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/T
+> emp/06_regression.log
+  log type:  text
+ closed on:   5 Feb 2026, 09:45:33
+-------------------------------------------------------------------------------

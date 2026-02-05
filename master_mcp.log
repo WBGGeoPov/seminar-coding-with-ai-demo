@@ -1,0 +1,590 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  c:/Users/wb532966/eb-local/seminar-coding-with-ai-demo-prep/master
+> _mcp.log
+  log type:  text
+ opened on:   5 Feb 2026, 09:46:33
+
+. /*===========================================================================
+> ===
+> Project: Poverty and Welfare Analysis 2018-2021
+> Purpose: Master script to run entire analysis
+> Date: February 5, 2026
+> =============================================================================
+> =*/
+. 
+. clear all
+
+. set more off
+
+. set varabbrev off
+
+. 
+. // Set project root directory
+. global root "c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep"
+
+. 
+. // Set subdirectories
+. global code     "${root}/Code"
+
+. global raw      "${root}/Data/Raw"
+
+. global final    "${root}/Data/Final"
+
+. global temp     "${root}/Data/Temp"
+
+. global tables   "${root}/Output/Tables"
+
+. global figures  "${root}/Output/Figures"
+
+. 
+. // Run all scripts in sequence
+. do "${code}/01_import.do"
+
+. /*===========================================================================
+> ===
+> Script: 01_import.do
+> Purpose: Import and convert CSV files to Stata format
+> Inputs: CSV files in Raw folder
+> Outputs: DTA files in Temp folder
+> =============================================================================
+> =*/
+. 
+. // CPI and PPP conversion factors
+. import delimited "${raw}/cpi_ppp.csv", clear varnames(1)
+(3 vars, 2 obs)
+
+. save "${temp}/cpi_ppp.dta", replace
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/cpi
+    > _ppp.dta saved
+
+. 
+. // ICP 2021 spatial deflators
+. import delimited "${raw}/icp2021.csv", clear varnames(1)
+(3 vars, 28 obs)
+
+. rename adm1cd_c ADM1CD_c
+
+. rename spat_def icp_spat_def
+
+. save "${temp}/icp2021.dta", replace
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/icp
+    > 2021.dta saved
+
+. 
+. // Additional spatial deflators
+. import delimited "${raw}/spat_def.csv", clear varnames(1)
+(3 vars, 28 obs)
+
+. rename adm1cd_c ADM1CD_c
+
+. save "${temp}/spat_def.dta", replace
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/spa
+    > t_def.dta saved
+
+. 
+end of do-file
+
+. do "${code}/02_clean.do"
+
+. /*===========================================================================
+> ===
+> Script: 02_clean.do
+> Purpose: Merge survey data with price deflators
+> Inputs: survey-2018-2021.dta, price deflator files
+> Outputs: survey_merged.dta
+> =============================================================================
+> =*/
+. 
+. use "${raw}/survey-2018-2021.dta", clear
+
+. 
+. // Convert year to numeric
+. destring year, replace
+year: all characters numeric; replaced as int
+
+. drop icp2021
+
+. 
+. // Merge CPI and PPP deflators by year
+. merge m:1 year using "${temp}/cpi_ppp.dta", keep(master match) nogenerate
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            49,996  
+    -----------------------------------------
+
+. 
+. // Merge ICP spatial deflators by year and region
+. merge m:1 year ADM1CD_c using "${temp}/icp2021.dta", keep(master match) nogen
+> erate
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            49,996  
+    -----------------------------------------
+
+. 
+. // Merge additional spatial deflators where ICP missing
+. merge m:1 year ADM1CD_c using "${temp}/spat_def.dta", keep(master match) noge
+> nerate
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            49,996  
+    -----------------------------------------
+
+. 
+. // Check for missing deflators
+. misstable summarize cpi2021 icp2021 icp_spat_def spat_def
+(variables nonmissing or string)
+
+. 
+. save "${temp}/survey_merged.dta", replace
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Temp/sur
+    > vey_merged.dta saved
+
+. 
+end of do-file
+
+. do "${code}/03_construct.do"
+
+. /*===========================================================================
+> ===
+> Script: 03_construct.do
+> Purpose: Construct PPP-adjusted welfare variable
+> Inputs: survey_merged.dta
+> Outputs: survey_analysis.dta
+> Notes: welfare_ppp = welfare adjusted for inflation (CPI),
+>        international prices (ICP), and spatial costs (spat_def)
+> =============================================================================
+> =*/
+. 
+. use "${temp}/survey_merged.dta", clear
+
+. 
+. // Create PPP-adjusted welfare variable
+. // Deflate by CPI to 2021 prices, convert to PPP, adjust for spatial costs
+. gen welfare_ppp = welfare / cpi2021 / icp2021 * spat_def
+
+. 
+. save "${final}/survey_analysis.dta", replace
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/Final/su
+    > rvey_analysis.dta saved
+
+. 
+end of do-file
+
+. do "${code}/04_analysis_regional.do"
+
+. /*===========================================================================
+> ===
+> Script: 04_analysis_regional.do
+> Purpose: Calculate descriptive statistics and poverty metrics by region-year
+> Inputs: survey_analysis.dta
+> Outputs: table1_descriptive_regional.dta, table2_poverty_regional.dta
+> =============================================================================
+> =*/
+. 
+. // TABLE 1: Descriptive Statistics by Region-Year
+. use "${final}/survey_analysis.dta", clear
+
+. 
+. // Count observations
+. gen obs = 1
+
+. collapse (count) n=obs ///
+>          (mean) age_mean=age lit_mean=literacy wel_mean=welfare_ppp ///
+>          (sd) age_sd=age lit_sd=literacy wel_sd=welfare_ppp, ///
+>          by(region year)
+
+. 
+. // Count households
+. tempfile desc_stats
+
+. save `desc_stats'
+file
+    C:\Users\wb532966\AppData\Local\Temp\stata_worker_default_f5t1lbbx\ST_6e8
+    > 4_000008.tmp saved as .dta format
+
+. 
+. use "${final}/survey_analysis.dta", clear
+
+. gen first_member = 1
+
+. bysort region year hhid: replace first_member = 0 if _n > 1
+(35810 real changes made)
+
+. collapse (sum) hhsize=first_member, by(region year)
+
+. 
+. merge 1:1 region year using `desc_stats', nogenerate
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                28  
+    -----------------------------------------
+
+. 
+. order region year n hhsize age_mean age_sd lit_mean lit_sd wel_mean wel_sd
+
+. 
+. save "${tables}/table1_descriptive_regional.dta", replace
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Tables
+    > /table1_descriptive_regional.dta saved
+
+. export delimited "${tables}/table1_descriptive_regional.csv", replace
+file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Tables/
+> table1_descriptive_regional.csv saved
+
+. 
+. // TABLE 2: Poverty and Inequality Metrics by Region-Year
+. use "${final}/survey_analysis.dta", clear
+
+. 
+. // Calculate poverty line as 40% of national median by year
+. bysort year: egen median_welfare = median(welfare_ppp)
+
+. gen poverty_line = median_welfare * 0.4
+
+. gen poor = (welfare_ppp < poverty_line)
+
+. 
+. // Poverty gap
+. gen poverty_gap_temp = (poverty_line - welfare_ppp) / poverty_line if poor ==
+>  1
+(47,111 missing values generated)
+
+. replace poverty_gap_temp = 0 if poor == 0
+(47,111 real changes made)
+
+. 
+. // Gini coefficient calculation
+. sort region year welfare_ppp
+
+. bysort region year: gen rank = _n
+
+. bysort region year: gen n_obs = _N
+
+. bysort region year: egen sum_welfare = sum(welfare_ppp)
+
+. gen gini_weight = (2 * rank - n_obs - 1) * welfare_ppp
+
+. bysort region year: egen sum_gini_weight = sum(gini_weight)
+
+. gen gini = sum_gini_weight / (n_obs * sum_welfare)
+
+. 
+. // Theil index
+. bysort region year: egen mean_welfare = mean(welfare_ppp)
+
+. gen welfare_ratio = welfare_ppp / mean_welfare
+
+. gen theil_component = welfare_ratio * ln(welfare_ratio)
+
+. replace theil_component = 0 if missing(theil_component)
+(0 real changes made)
+
+. 
+. // Collapse to region-year level
+. collapse (mean) pov_rate=poor pov_gap=poverty_gap_temp ///
+>          gini_index=gini theil_index=theil_component, ///
+>          by(region year)
+
+. 
+. order region year pov_rate pov_gap gini_index theil_index
+
+. 
+. save "${tables}/table2_poverty_regional.dta", replace
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Tables
+    > /table2_poverty_regional.dta saved
+
+. export delimited "${tables}/table2_poverty_regional.csv", replace
+file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Tables/
+> table2_poverty_regional.csv saved
+
+. 
+end of do-file
+
+. do "${code}/05_analysis_national.do"
+
+. /*===========================================================================
+> ===
+> Script: 05_analysis_national.do
+> Purpose: Calculate descriptive statistics and poverty metrics at national lev
+> el
+> Inputs: survey_analysis.dta
+> Outputs: table3_national.dta
+> =============================================================================
+> =*/
+. 
+. use "${final}/survey_analysis.dta", clear
+
+. 
+. // Count observations
+. gen obs = 1
+
+. collapse (count) n=obs ///
+>          (mean) age_mean=age lit_mean=literacy wel_mean=welfare_ppp ///
+>          (sd) age_sd=age lit_sd=literacy wel_sd=welfare_ppp, ///
+>          by(year)
+
+. 
+. tempfile desc_national
+
+. save `desc_national'
+file
+    C:\Users\wb532966\AppData\Local\Temp\stata_worker_default_f5t1lbbx\ST_6e8
+    > 4_000008.tmp saved as .dta format
+
+. 
+. // Count households
+. use "${final}/survey_analysis.dta", clear
+
+. gen first_member = 1
+
+. bysort year hhid: replace first_member = 0 if _n > 1
+(35810 real changes made)
+
+. collapse (sum) hhsize=first_member, by(year)
+
+. 
+. merge 1:1 year using `desc_national', nogenerate
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                 2  
+    -----------------------------------------
+
+. 
+. tempfile desc_complete
+
+. save `desc_complete'
+file
+    C:\Users\wb532966\AppData\Local\Temp\stata_worker_default_f5t1lbbx\ST_6e8
+    > 4_000009.tmp saved as .dta format
+
+. 
+. // Poverty and inequality metrics
+. use "${final}/survey_analysis.dta", clear
+
+. 
+. bysort year: egen median_welfare = median(welfare_ppp)
+
+. gen poverty_line = median_welfare * 0.4
+
+. gen poor = (welfare_ppp < poverty_line)
+
+. 
+. gen poverty_gap_temp = (poverty_line - welfare_ppp) / poverty_line if poor ==
+>  1
+(47,111 missing values generated)
+
+. replace poverty_gap_temp = 0 if poor == 0
+(47,111 real changes made)
+
+. 
+. sort year welfare_ppp
+
+. bysort year: gen rank = _n
+
+. bysort year: gen n_obs = _N
+
+. bysort year: egen sum_welfare = sum(welfare_ppp)
+
+. gen gini_weight = (2 * rank - n_obs - 1) * welfare_ppp
+
+. bysort year: egen sum_gini_weight = sum(gini_weight)
+
+. gen gini = sum_gini_weight / (n_obs * sum_welfare)
+
+. 
+. bysort year: egen mean_welfare = mean(welfare_ppp)
+
+. gen welfare_ratio = welfare_ppp / mean_welfare
+
+. gen theil_component = welfare_ratio * ln(welfare_ratio)
+
+. replace theil_component = 0 if missing(theil_component)
+(0 real changes made)
+
+. 
+. collapse (mean) pov_rate=poor pov_gap=poverty_gap_temp ///
+>          gini_index=gini theil_index=theil_component, ///
+>          by(year)
+
+. 
+. merge 1:1 year using `desc_complete', nogenerate
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                 2  
+    -----------------------------------------
+
+. 
+. order year n hhsize age_mean age_sd lit_mean lit_sd wel_mean wel_sd ///
+>       pov_rate pov_gap gini_index theil_index
+
+. 
+. save "${tables}/table3_national.dta", replace
+file
+    c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Tables
+    > /table3_national.dta saved
+
+. export delimited "${tables}/table3_national.csv", replace
+file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Tables/
+> table3_national.csv saved
+
+. 
+end of do-file
+
+. do "${code}/06_regression.do"
+
+. /*===========================================================================
+> ===
+> Script: 06_regression.do
+> Purpose: Estimate determinants of welfare
+> Inputs: survey_analysis.dta
+> Outputs: table4_regression.txt
+> =============================================================================
+> =*/
+. 
+. use "${final}/survey_analysis.dta", clear
+
+. 
+. // Model 1: Pooled regression
+. quietly reg welfare_ppp age adult adult_working i.educat4 i.literacy i.year
+
+. estimates store model1
+
+. 
+. // Model 2: 2018 only
+. quietly reg welfare_ppp age adult adult_working i.educat4 i.literacy if year 
+> == 2018
+
+. estimates store model2
+
+. 
+. // Model 3: 2021 only
+. quietly reg welfare_ppp age adult adult_working i.educat4 i.literacy if year 
+> == 2021
+
+. estimates store model3
+
+. 
+. // Model 4: Pooled with robust standard errors
+. quietly reg welfare_ppp age adult adult_working i.educat4 i.literacy i.year, 
+> robust
+
+. estimates store model4
+
+. 
+. // Export to text file for importing to other software
+. quietly {
+
+. 
+end of do-file
+
+. do "${code}/07_figures.do"
+
+. /*===========================================================================
+> ===
+> Script: 07_figures.do
+> Purpose: Generate descriptive figures
+> Inputs: survey_analysis.dta
+> Outputs: PNG files in Figures folder
+> =============================================================================
+> =*/
+. 
+. use "${final}/survey_analysis.dta", clear
+
+. 
+. // Age distribution
+. histogram age, title("Age Distribution") ///
+>                xtitle("Age") ytitle("Density") scheme(s2color)
+(bin=46, start=0, width=2.4347826)
+
+. graph export "${figures}/fig1_age_distribution.png", replace
+(file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Figure
+> s/fig1_age_distribution.png not found)
+file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Figures
+> /fig1_age_distribution.png written in PNG format
+
+. 
+. // Household size distribution
+. gen first_member = 1
+
+. bysort hhid: replace first_member = 0 if _n > 1
+(35810 real changes made)
+
+. bysort hhid: egen hh_size = count(hhid)
+
+. 
+. histogram hh_size if first_member == 1, discrete ///
+>                   title("Household Size Distribution") ///
+>                   xtitle("Household Size") ytitle("Frequency") scheme(s2color
+> )
+(start=1, width=1)
+
+. graph export "${figures}/fig2_household_size.png", replace
+(file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Figure
+> s/fig2_household_size.png not found)
+file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Figures
+> /fig2_household_size.png written in PNG format
+
+. 
+. // Welfare distribution by year
+. histogram welfare_ppp if year == 2018, ///
+>           title("Welfare Distribution 2018") ///
+>           xtitle("Welfare (PPP)") ytitle("Density") scheme(s2color)
+(bin=43, start=172.27271, width=1400.6374)
+
+. graph export "${figures}/fig3_welfare_2018.png", replace
+(file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Figure
+> s/fig3_welfare_2018.png not found)
+file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Figures
+> /fig3_welfare_2018.png written in PNG format
+
+. 
+. histogram welfare_ppp if year == 2021, ///
+>           title("Welfare Distribution 2021") ///
+>           xtitle("Welfare (PPP)") ytitle("Density") scheme(s2color)
+(bin=44, start=179.38255, width=873.97311)
+
+. graph export "${figures}/fig4_welfare_2021.png", replace
+(file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Figure
+> s/fig4_welfare_2021.png not found)
+file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Figures
+> /fig4_welfare_2021.png written in PNG format
+
+. 
+. // Overall welfare distribution
+. histogram welfare_ppp, title("Welfare Distribution (All Years)") ///
+>                       xtitle("Welfare (PPP)") ytitle("Density") scheme(s2colo
+> r)
+(bin=46, start=172.27271, width=1309.2915)
+
+. graph export "${figures}/fig5_welfare_pooled.png", replace
+(file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Figure
+> s/fig5_welfare_pooled.png not found)
+file c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Output/Figures
+> /fig5_welfare_pooled.png written in PNG format
+
+. 
+end of do-file
+
+. 
+. capture log close _all

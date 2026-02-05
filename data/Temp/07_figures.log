@@ -1,0 +1,38 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  c:\Users\wb532966\eb-local\seminar-coding-with-ai-demo-prep/Data/T
+> emp/07_figures.log
+  log type:  text
+ opened on:   5 Feb 2026, 09:45:33
+
+. 
+. use "${final}/survey_analysis.dta", clear
+
+. 
+. // Age distribution
+. histogram age, title("Age Distribution") ///
+>                xtitle("Age") ytitle("Density") scheme(s2color)
+(bin=46, start=0, width=2.4347826)
+unexpected end of file
+(error occurred while loading markerstyle.class)
+markerstyle: class type not found
+unexpected end of file
+(error occurred while loading seriesstyle.class)
+seriesstyle.new: class member function not found
+unexpected end of file
+(error occurred while loading yxview.class)
+yxview: class type not found
+(error occurred while loading y2xview_g.class)
+y2xview_g.new , type(rbar) serset(__key(1bc40323aa8)) yvariable(1)
+    xvariable(3) plotregion(__key(1bc403288c8)) style(scheme p1bar) ybvar(2):
+    class member function not found
+--Break--
+r(1);
+
+end of do-file
+--Break--
+r(1);
+--Break--
+r(1);
+
+. capture log close _all
