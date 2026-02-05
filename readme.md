@@ -23,14 +23,14 @@ This demonstration follows a complete workflow:
 ### Prerequisites
 
 - 📖 [Seminar materials](https://wbggeopov.github.io/geoPovLearn/seminars/seminar-2026-02/overview.html)
-- 🎥 Step-by-step video _(Coming soon)_
+- 🎥 [youtu.be/V6NZUXUHviE](https://youtu.be/V6NZUXUHviE)
 - 📊 [Seminar presentation](https://wbggeopov.github.io/geoPovLearn/seminars/seminar-2026-02/slides.html#/)
 - 🔧 [Setup instructions](https://wbggeopov.github.io/geoPovLearn/seminars/seminar-2026-02/setup-instructions.html)
 
 ## 💻 Repository
 
 The complete code is available on GitHub:  
-🔗 https://github.com/wb532966/seminar-coding-with-ai-demo
+🔗 [https://github.com/WBGGeoPov/seminar-coding-with-ai-demo](https://github.com/WBGGeoPov/seminar-coding-with-ai-demo)
 
 ## Example prompting
 
